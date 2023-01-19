@@ -21,6 +21,7 @@ add_config() {
 add_config "max-jobs = auto"
 # Allow binary caches for user
 add_config "trusted-users = root $USER"
+add_config "auto-allocate-uids = true"
 # Add github access token
 if [[ $INPUT_GITHUB_ACCESS_TOKEN != "" ]]; then
   add_config "access-tokens" "github.com=$INPUT_GITHUB_ACCESS_TOKEN"
@@ -30,7 +31,7 @@ if [[ $INPUT_EXTRA_NIX_CONFIG != "" ]]; then
   add_config "$INPUT_EXTRA_NIX_CONFIG"
 fi
 if [[ ! $INPUT_EXTRA_NIX_CONFIG =~ "experimental-features" ]]; then
-  add_config "experimental-features = nix-command flakes"
+  add_config "experimental-features = nix-command flakes auto-allocate-uids"
 fi
 
 # Nix installer flags
@@ -44,12 +45,8 @@ installer_options=(
 if [[ (! $INPUT_INSTALL_OPTIONS =~ "--no-daemon") && ($OSTYPE =~ darwin || -e /run/systemd/system) ]]; then
   installer_options+=(
     --daemon
-    --daemon-user-count "$(python3 -c 'import multiprocessing as mp; print(mp.cpu_count() * 2)')"
   )
 else
-  # "fix" the following error when running nix*
-  # error: the group 'nixbld' specified in 'build-users-group' does not exist
-  add_config "build-users-group ="
   sudo mkdir -p /etc/nix
   sudo chmod 0755 /etc/nix
   sudo cp $workdir/nix.conf /etc/nix/nix.conf
