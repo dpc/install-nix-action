@@ -45,6 +45,7 @@ installer_options=(
 if [[ (! $INPUT_INSTALL_OPTIONS =~ "--no-daemon") && ($OSTYPE =~ darwin || -e /run/systemd/system) ]]; then
   installer_options+=(
     --daemon
+    --daemon-user-count 1
   )
 else
   sudo mkdir -p /etc/nix
