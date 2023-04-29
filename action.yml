@@ -19,7 +19,7 @@ runs:
   using: 'composite'
   steps:
     - run : ${{ github.action_path }}/install-nix.sh
-      shell: bash
+      shell: bash -leo pipefail {0}
       env:
         INPUT_EXTRA_NIX_CONFIG: ${{ inputs.extra_nix_config }}
         INPUT_GITHUB_ACCESS_TOKEN: ${{ inputs.github_access_token }}
